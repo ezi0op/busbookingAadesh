@@ -1,0 +1,126 @@
+.header {
+  background-color: #d84e55;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ✅ Logo */
+.header-logo {
+  text-decoration: none;
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-logo span {
+  font-size: 20px;
+}
+
+/* ✅ Nav */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+.nav-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* ✅ Logged in user name */
+.nav-user {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  background: rgba(255,255,255,0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+/* ✅ Logout button */
+.btn-logout {
+  background: white;
+  color: #d84e55;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-logout:hover {
+  background: #ffe0e0;
+}
+
+/* ✅ Register button */
+.btn-register {
+  background: white;
+  color: #d84e55;
+  text-decoration: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.btn-register:hover {
+  background: #ffe0e0;
+}
+
+/* ✅ Hamburger — mobile only */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* ✅ Mobile responsive */
+@media (max-width: 768px) {
+  .hamburger { display: block; }
+
+  .header-nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: #d84e55;
+    padding: 16px;
+    gap: 16px;
+    align-items: flex-start;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  .header-nav.open {
+    display: flex;
+  }
+}

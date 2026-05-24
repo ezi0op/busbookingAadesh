@@ -1,0 +1,92 @@
+package com.ash.bbus.web.BusTicketBookingSystem.util;
+
+import com.ash.bbus.web.BusTicketBookingSystem.entity.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+@Component
+public class JwtUtil {
+
+	@Value("${jwt.secret}")
+	private String secret;
+
+	@Value("${jwt.expiration}")
+	private long expiration;
+
+	// ✅ 0.12.6 uses SecretKey instead of Key
+	private SecretKey getSigningKey() {
+		return Keys.hmacShaKeyFor(secret.getBytes());
+	}
+
+	// ✅ Generate token
+	public String generateToken(User user) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("role", user.getRole().name());
+		claims.put("userId", user.getId());
+		claims.put("name", user.getName());
+		return buildToken(claims, user.getEmail());
+	}
+
+	// ✅ 0.12.6 builder API
+	private String buildToken(Map<String, Object> claims, String subject) {
+		return Jwts.builder().claims(claims) // ✅ 0.12.6: .claims() not .setClaims()
+				.subject(subject) // ✅ 0.12.6: .subject() not .setSubject()
+				.issuedAt(new Date()) // ✅ 0.12.6: .issuedAt()
+				.expiration(new Date( // ✅ 0.12.6: .expiration()
+						System.currentTimeMillis() + expiration))
+				.signWith(getSigningKey()) // ✅ 0.12.6: no algorithm needed
+				.compact();
+	}
+
+	// ✅ Extract email
+	public String extractEmail(String token) {
+		return extractClaim(token, Claims::getSubject);
+	}
+
+	// ✅ Extract userId
+	public Long extractUserId(String token) {
+		Claims claims = extractAllClaims(token);
+		return ((Number) claims.get("userId")).longValue();
+	}
+
+	// ✅ Extract role
+	public String extractRole(String token) {
+		return (String) extractAllClaims(token).get("role");
+	}
+
+	// ✅ Validate token
+	public boolean isTokenValid(String token, UserDetails userDetails) {
+		final String email = extractEmail(token);
+		return email.equals(userDetails.getUsername()) && !isTokenExpired(token);
+	}
+
+	private boolean isTokenExpired(String token) {
+		return extractExpiration(token).before(new Date());
+	}
+
+	private Date extractExpiration(String token) {
+		return extractClaim(token, Claims::getExpiration);
+	}
+
+	public <T> T extractClaim(String token, Function<Claims, T> resolver) {
+		return resolver.apply(extractAllClaims(token));
+	}
+
+	// ✅ 0.12.6 parser API
+	private Claims extractAllClaims(String token) {
+		return Jwts.parser() // ✅ .parser() not .parserBuilder()
+				.verifyWith(getSigningKey()) // ✅ .verifyWith() not .setSigningKey()
+				.build().parseSignedClaims(token) // ✅ .parseSignedClaims() not .parseClaimsJws()
+				.getPayload(); // ✅ .getPayload() not .getBody()
+	}
+}

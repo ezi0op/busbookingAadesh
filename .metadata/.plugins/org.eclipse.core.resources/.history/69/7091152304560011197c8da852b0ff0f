@@ -1,0 +1,60 @@
+package com.ash.bbus.web.BusTicketBookingSystem.controller;
+
+import com.ash.bbus.web.BusTicketBookingSystem.dto.ApiResponse;
+import com.ash.bbus.web.BusTicketBookingSystem.dto.PaymentDTO;
+import com.ash.bbus.web.BusTicketBookingSystem.service.PaymentService;
+
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/payments")
+public class PaymentController {
+
+    private final PaymentService paymentService;
+
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    // ✅ POST /api/payments/{bookingId}
+    @PostMapping("/{bookingId}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<ApiResponse<PaymentDTO>> processPayment(
+            @PathVariable Long bookingId,
+            @Valid @RequestBody PaymentDTO dto) {
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(ApiResponse.success("Payment successful",
+                paymentService.processPayment(bookingId, dto)));
+    }
+
+    // ✅ GET /api/payments/{bookingId}
+    @GetMapping("/{bookingId}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<ApiResponse<PaymentDTO>> getPayment(
+            @PathVariable Long bookingId) {
+
+        return ResponseEntity.ok(
+            ApiResponse.success("Payment details",
+                paymentService.getPaymentByBookingId(bookingId))
+        );
+    }
+
+    // ✅ POST /api/payments/{bookingId}/refund — ADMIN only
+    @PostMapping("/{bookingId}/refund")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<PaymentDTO>> processRefund(
+            @PathVariable Long bookingId) {
+
+        return ResponseEntity.ok(
+            ApiResponse.success("Refund processed",
+                paymentService.processRefund(bookingId))
+        );
+    }
+}

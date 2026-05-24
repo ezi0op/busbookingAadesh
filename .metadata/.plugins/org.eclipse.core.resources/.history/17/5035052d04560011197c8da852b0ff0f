@@ -1,0 +1,72 @@
+package com.ash.bbus.web.BusTicketBookingSystem.dao.daoImplementation;
+
+import com.ash.bbus.web.BusTicketBookingSystem.dao.BusDao;
+import com.ash.bbus.web.BusTicketBookingSystem.entity.Bus;
+import com.ash.bbus.web.BusTicketBookingSystem.entity.enums.BusType;
+import com.ash.bbus.web.BusTicketBookingSystem.entity.enums.SeatType;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public class BusDaoImpl implements BusDao {
+
+    // ✅ EntityManager for JPQL queries
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Override
+    public List<Bus> findByBusType(BusType busType) {
+        TypedQuery<Bus> query = entityManager.createQuery(
+            "SELECT b FROM Bus b WHERE b.busType = :busType",
+            Bus.class
+        );
+        query.setParameter("busType", busType);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Bus> findBySeatType(SeatType seatType) {
+        TypedQuery<Bus> query = entityManager.createQuery(
+            "SELECT b FROM Bus b WHERE b.seatType = :seatType",
+            Bus.class
+        );
+        query.setParameter("seatType", seatType);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Bus> searchByName(String keyword) {
+        TypedQuery<Bus> query = entityManager.createQuery(
+            "SELECT b FROM Bus b WHERE LOWER(b.name) " +
+            "LIKE LOWER(CONCAT('%', :keyword, '%'))",
+            Bus.class
+        );
+        query.setParameter("keyword", keyword);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Bus> findBusesWithAvailableTrips(String source,
+                                                   String destination,
+                                                   String date) {
+        TypedQuery<Bus> query = entityManager.createQuery(
+            "SELECT DISTINCT t.bus FROM Trip t " +
+            "WHERE LOWER(t.route.source) = LOWER(:source) " +
+            "AND LOWER(t.route.destination) = LOWER(:destination) " +
+            "AND CAST(t.travelDate AS string) = :date " +
+            "AND t.status = 'SCHEDULED' " +
+            "AND t.availableSeats > 0",
+            Bus.class
+        );
+        query.setParameter("source", source);
+        query.setParameter("destination", destination);
+        query.setParameter("date", date);
+        return query.getResultList();
+    }
+}

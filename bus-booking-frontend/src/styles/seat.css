@@ -1,0 +1,490 @@
+/* ===== PAGE HEADER ===== */
+.seat-page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.btn-back {
+  background: white;
+  border: 1.5px solid #e0e0e0;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: #333;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.btn-back:hover {
+  background: #f5f5f5;
+}
+
+.seat-page-title h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.seat-route {
+  font-size: 14px;
+  color: #888;
+}
+
+/* ===== PAGE LAYOUT ===== */
+.seat-page-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ===== LEGEND ===== */
+.seat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 14px 20px;
+  margin-bottom: 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: #444;
+}
+
+.legend-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1.5px solid;
+}
+
+.legend-available {
+  background: #fff;
+  border-color: #aaa;
+}
+.legend-selected {
+  background: #d84e55;
+  border-color: #d84e55;
+}
+.legend-booked {
+  background: #e0e0e0;
+  border-color: #bbb;
+}
+.legend-locked {
+  background: #fff3e0;
+  border-color: #fb8c00;
+}
+.legend-upper {
+  background: #fff;
+  border-color: #aaa;
+  border-style: dashed;
+}
+
+/* ===== SEAT LAYOUT WRAPPER ===== */
+.seat-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===== DECK ===== */
+.deck {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.deck-label {
+  background: #d84e55;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ===== BUS INTERIOR ===== */
+.bus-interior {
+  padding: 16px 20px;
+}
+
+/* Driver cabin */
+.driver-cabin {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  border: 1px dashed #ccc;
+}
+
+.driver-icon { font-size: 20px; }
+.driver-text {
+  font-size: 12px;
+  color: #888;
+  font-weight: 600;
+}
+
+/* Aisle header labels */
+.aisle-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.side-label {
+  font-size: 11px;
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.aisle-gap {
+  flex: 1;
+}
+
+/* ===== SEAT ROW ===== */
+.seat-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 8px;
+  padding: 4px 0;
+  border-bottom: 1px dashed #f0f0f0;
+}
+.seat-row:last-child {
+  border-bottom: none;
+}
+
+/* Left side — single seat */
+.seat-side-left {
+  width: 70px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Aisle middle */
+.aisle {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.aisle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1.5px dashed #e0e0e0;
+}
+
+.row-number {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #888;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+/* Right side — double berth */
+.seat-side-right {
+  width: 140px;
+  display: flex;
+  justify-content: center;
+}
+
+.double-berth {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Placeholder when no seat */
+.seat-placeholder {
+  width: 64px;
+  height: 44px;
+}
+
+/* ===== INDIVIDUAL SEAT CELL ===== */
+.seat-cell {
+  width: 64px;
+  height: 44px;
+  border-radius: 8px;
+  border: 2px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+  position: relative;
+  user-select: none;
+}
+
+.seat-cell:hover:not(.seat-booked):not(.seat-locked) {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Available */
+.seat-available {
+  background: #ffffff;
+  border-color: #aaaaaa;
+  color: #333;
+}
+.seat-available:hover {
+  border-color: #d84e55;
+  background: #fff5f5;
+}
+
+/* Selected */
+.seat-selected {
+  background: #d84e55;
+  border-color: #d84e55;
+  color: white;
+}
+
+/* Booked */
+.seat-booked {
+  background: #e0e0e0;
+  border-color: #bbbbbb;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Locked */
+.seat-locked {
+  background: #fff3e0;
+  border-color: #fb8c00;
+  color: #e65100;
+  cursor: not-allowed;
+}
+
+/* Upper berth — dashed border */
+.seat-upper.seat-available {
+  border-style: dashed;
+}
+.seat-upper.seat-selected {
+  border-style: solid;
+}
+
+/* Seat number text */
+.seat-number {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Berth indicator dot */
+.seat-berth-dot {
+  width: 6px;
+  height: 3px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.4;
+  margin-top: 3px;
+}
+
+/* ===== DECK SEPARATOR ===== */
+.deck-separator {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #888;
+  padding: 8px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px dashed #ddd;
+  letter-spacing: 0.05em;
+}
+
+/* ===== SUMMARY CARD ===== */
+.seat-summary {
+  position: sticky;
+  top: 80px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.summary-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-empty {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  line-height: 1.8;
+  padding: 20px 0;
+}
+
+/* Selected seats list */
+.summary-seats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.summary-seat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #fff5f5;
+  border-radius: 8px;
+  border: 1px solid #ffd0d0;
+}
+
+.summary-seat-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summary-seat-num {
+  font-size: 14px;
+  font-weight: 700;
+  color: #d84e55;
+}
+
+.summary-seat-meta {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.summary-seat-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.btn-remove-seat {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+.btn-remove-seat:hover {
+  color: #d84e55;
+  background: #ffe0e0;
+}
+
+/* Divider */
+.summary-divider {
+  border: none;
+  border-top: 1px solid #f0f0f0;
+  margin: 12px 0;
+}
+
+/* Total */
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 16px;
+}
+
+.summary-total-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: #d84e55;
+}
+
+/* Proceed button */
+.btn-proceed {
+  width: 100%;
+  background: #d84e55;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-proceed:hover {
+  background: #b83c42;
+}
+
+/* Error box */
+.error-box {
+  background: #ffebee;
+  border: 1px solid #ef9a9a;
+  border-radius: 10px;
+  padding: 16px 20px;
+  color: #c62828;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .seat-page-layout {
+    grid-template-columns: 1fr;
+  }
+  .seat-summary {
+    position: static;
+  }
+}
+
+@media (max-width: 480px) {
+  .seat-cell {
+    width: 52px;
+    height: 38px;
+  }
+  .seat-side-right {
+    width: 110px;
+  }
+}
