@@ -9,5 +9,5 @@ import com.ash.bbus.web.BusTicketBookingSystem.entity.BusOperator;
 
 @Repository
 public interface BusOperatorRepository extends JpaRepository<BusOperator, Long> {
-    List<BusOperator> findByOperatorNameContainingIgnoreCase(String name);
+    List<BusOperator> findByNameContainingIgnoreCase(String name);
 }

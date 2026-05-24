@@ -139,3 +139,6 @@ We have successfully integrated the `ChatbotServiceImpl` with the following key 
   - Added `/api/chat` so guests can access the BlueBus Concierge AI.
   - Added `GET /api/coupons/**` to the public GET endpoints so users can view active coupons without being logged in.
 - **Strict Authentication:** Ensured that all other endpoints strictly require authentication (`.anyRequest().authenticated()`).
+
+## 13. Bug Fixes
+- **BusOperatorRepository:** Fixed startup crash (`No property 'operatorName' found for type 'BusOperator'`). Changed `findByOperatorNameContainingIgnoreCase` to `findByNameContainingIgnoreCase` in `BusOperatorRepository` and `BusOperatorServiceImpl` to correctly map to the `name` property of the `BusOperator` entity.

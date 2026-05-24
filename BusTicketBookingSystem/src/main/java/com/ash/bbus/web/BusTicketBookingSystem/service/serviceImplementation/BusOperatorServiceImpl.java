@@ -57,7 +57,7 @@ public class BusOperatorServiceImpl implements BusOperatorService {
 
     @Override
     public List<BusOperator> searchOperators(String name) {
-        return busOperatorRepository.findByOperatorNameContainingIgnoreCase(name);
+        return busOperatorRepository.findByNameContainingIgnoreCase(name);
     }
 
     @Override
