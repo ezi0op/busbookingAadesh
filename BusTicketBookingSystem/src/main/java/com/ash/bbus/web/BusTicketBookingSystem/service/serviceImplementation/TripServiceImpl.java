@@ -78,7 +78,7 @@ public class TripServiceImpl implements TripService {
 
     @Override
     public List<TripDTO> getAllTrips() {
-        return tripRepository.findAll()
+        return tripRepository.findAllWithBusAndRoute()
             .stream()
             .map(this::mapToDTO)
             .collect(Collectors.toList());

@@ -11,6 +11,7 @@ import com.ash.bbus.web.BusTicketBookingSystem.repository.UserRepository;
 import com.ash.bbus.web.BusTicketBookingSystem.repository.WalletRepository;
 import com.ash.bbus.web.BusTicketBookingSystem.service.UserService;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +25,15 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final WalletRepository walletRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final String adminSecret;
 
 	public UserServiceImpl(UserRepository userRepository, WalletRepository walletRepository,
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder,
+			@Value("${app.admin.secret}") String adminSecret) {
 		this.userRepository = userRepository;
 		this.walletRepository = walletRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.adminSecret = adminSecret;
 	}
 
 	// ✅ Register normal user
@@ -63,7 +67,7 @@ public class UserServiceImpl implements UserService {
 	public UserResponseDTO registerAdmin(RegisterDTO dto, String secretKey) {
 
 		// ✅ Verify secret key
-		if (!"BUSADMIN2024".equals(secretKey)) {
+		if (!adminSecret.equals(secretKey)) {
 			throw new IllegalArgumentException("Invalid secret key");
 		}
 

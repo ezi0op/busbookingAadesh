@@ -3,6 +3,7 @@ package com.ash.bbus.web.BusTicketBookingSystem.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.ash.bbus.web.BusTicketBookingSystem.entity.BusOperator;
@@ -19,6 +20,7 @@ public class BusOperatorController {
     private final BusOperatorService busOperatorService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BusOperator> createOperator(@RequestBody BusOperator operator) {
         return ResponseEntity.ok(busOperatorService.createOperator(operator));
     }
@@ -34,11 +36,13 @@ public class BusOperatorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BusOperator> updateOperator(@PathVariable Long id, @RequestBody BusOperator operator) {
         return ResponseEntity.ok(busOperatorService.updateOperator(id, operator));
     }
 
     @DeleteMapping("/{id}/deactivate")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BusOperator> deactivateOperator(@PathVariable Long id) {
         return ResponseEntity.ok(busOperatorService.deactivateOperator(id));
     }

@@ -115,12 +115,7 @@ public class TripSeatServiceImpl implements TripSeatService {
                 SeatStatus.LOCKED, LocalDateTime.now()
             );
 
-        expired.forEach(seat -> {
-            seat.releaseLock();
-            // ✅ Increment availableSeats on trip
-            Trip trip = seat.getTrip();
-            trip.setAvailableSeats(trip.getAvailableSeats() + 1);
-        });
+        expired.forEach(TripSeat::releaseLock);
 
         tripSeatRepository.saveAll(expired);
     }

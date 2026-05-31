@@ -4,6 +4,7 @@ import com.ash.bbus.web.BusTicketBookingSystem.dto.ApiResponse;
 import com.ash.bbus.web.BusTicketBookingSystem.dto.BookingDTO;
 import com.ash.bbus.web.BusTicketBookingSystem.entity.User;
 import com.ash.bbus.web.BusTicketBookingSystem.service.BookingService;
+import com.ash.bbus.web.BusTicketBookingSystem.service.CancellationPolicyService;
 import com.ash.bbus.web.BusTicketBookingSystem.service.EmailService;
 import com.ash.bbus.web.BusTicketBookingSystem.service.TicketService;
 
@@ -24,11 +25,14 @@ public class BookingController {
 	private final BookingService bookingService;
 	private final TicketService ticketService;
 	private final EmailService emailService;
+	private final CancellationPolicyService cancellationPolicyService;
 
-	public BookingController(BookingService bookingService, TicketService ticketService, EmailService emailService) {
+	public BookingController(BookingService bookingService, TicketService ticketService, EmailService emailService,
+			CancellationPolicyService cancellationPolicyService) {
 		this.bookingService = bookingService;
 		this.ticketService = ticketService;
 		this.emailService = emailService;
+		this.cancellationPolicyService = cancellationPolicyService;
 	}
 
 	// ✅ POST /api/bookings — create booking
@@ -89,7 +93,7 @@ public class BookingController {
 		try {
 			String pnr = ticketService.getTicketByBookingId(id).getPnrNumber();
 			emailService.sendCancellationConfirmation(currentUser.getEmail(), pnr,
-					cancelled.getTotalAmount().divide(new java.math.BigDecimal("2")).toString());
+					cancellationPolicyService.calculateRefundAmount(id).toString());
 		} catch (Exception e) {
 			// Email failure should not break cancellation
 		}

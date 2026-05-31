@@ -142,3 +142,154 @@ We have successfully integrated the `ChatbotServiceImpl` with the following key 
 
 ## 13. Bug Fixes
 - **BusOperatorRepository:** Fixed startup crash (`No property 'operatorName' found for type 'BusOperator'`). Changed `findByOperatorNameContainingIgnoreCase` to `findByNameContainingIgnoreCase` in `BusOperatorRepository` and `BusOperatorServiceImpl` to correctly map to the `name` property of the `BusOperator` entity.
+
+---
+
+## 14. Service Review and Booking Flow Fixes
+
+The following fixes were applied during the Bus Ticket Booking System service review:
+
+### TicketServiceImpl
+- Added null safety before reading `booking.getPayment().getMethod()` so ticket DTO generation no longer throws a `NullPointerException` for unpaid or pending bookings.
+- Fixed ticket seat type mapping so `TripSeatDTO.seatType` is populated from the bus seat type linked through the physical seat.
+- Added read-only transactions around ticket lookup/download flows to keep lazy booking, trip, bus, route, passenger, and seat data available while building the response.
+
+### PaymentServiceImpl
+- Replaced the hard-coded 50% refund calculation with `CancellationPolicyService.calculateRefundAmount(bookingId)`.
+- Refunds now follow the configured policy:
+  - `>= 24` hours before departure: 100%
+  - `>= 12` hours before departure: 70%
+  - `>= 4` hours before departure: 40%
+  - `< 4` hours before departure: 0%
+
+### BookingServiceImpl
+- Updated the wallet credit description from a fixed `50% Refund` label to a generic refund label so the audit text matches the dynamic cancellation policy.
+
+### TripServiceImpl and TripRepository
+- Added `TripRepository.findAllWithBusAndRoute()` with `JOIN FETCH t.bus` and `JOIN FETCH t.route`.
+- Updated `TripServiceImpl.getAllTrips()` to use the fetch-join query, reducing Hibernate N+1 queries when mapping trip responses.
+
+### TripSeatServiceImpl
+- Reviewed `releaseExpiredLocks()` and removed the incorrect `availableSeats` increment.
+- Seat locking does not decrement `Trip.availableSeats`; only confirmed booking and cancellation adjust that count.
+
+### BusServiceImpl
+- Implemented `addSeatsToBus(...)`.
+- Implemented `getSeatsByBus(...)`.
+- Added seat persistence via `SeatRepository`, duplicate seat-number validation per bus, Bus-to-Seat linking, DTO mapping, and bus total seat count synchronization.
+
+### QRCodeServiceImpl
+- Replaced mock string bytes with real PNG QR code generation using ZXing.
+- Added booking existence validation before generating the QR code.
+
+### InvoiceServiceImpl
+- Replaced plain text invoice bytes with a real PDF generated using PDFBox.
+- Invoice PDF now includes booking ID, passenger details, route, seats, amount, payment method, and transaction ID.
+- Added null-safe payment display for pending/unpaid bookings.
+
+### UserServiceImpl
+- Removed the hard-coded admin secret from Java code.
+- Added `app.admin.secret=BUSADMIN2024` to `application.properties`.
+- Injected the admin secret with `@Value("${app.admin.secret}")`.
+
+### Dependencies Added
+- Added ZXing dependencies for QR PNG generation:
+  - `com.google.zxing:core:3.5.3`
+  - `com.google.zxing:javase:3.5.3`
+- Added PDFBox for real PDF invoice generation:
+  - `org.apache.pdfbox:pdfbox:2.0.31`
+
+### Verification
+The project was compiled successfully with:
+
+```powershell
+.\mvnw.cmd compile
+```
+
+**Result:** `BUILD SUCCESS`
+
+---
+
+## 15. DTO Lombok Cleanup
+
+- Removed hand-written getter and setter methods from DTO classes under `src/main/java/com/ash/bbus/web/BusTicketBookingSystem/dto`.
+- Added Lombok `@Getter`, `@Setter`, and `@NoArgsConstructor` to DTOs that still had manual accessor boilerplate.
+- Preserved useful custom constructors and helper/factory methods, including:
+  - `ApiResponse.success(...)` / `ApiResponse.failure(...)`
+  - `AuthResponseDTO(...)`
+  - `UserResponseDTO(...)`
+  - `ErrorResponse(...)`
+  - `EmailDTO(...)` overloads and `hasAttachment()`
+- Left existing Lombok-based chat DTOs unchanged because they were already using Lombok.
+
+### Verification
+The project was compiled successfully after the DTO cleanup:
+
+```powershell
+.\mvnw.cmd compile
+```
+
+**Result:** `BUILD SUCCESS`
+
+---
+
+## 16. Controller API Review and Smoke Testing
+
+- Added missing bus seat controller APIs:
+  - `POST /api/buses/{id}/seats`
+  - `GET /api/buses/{id}/seats`
+- Added explicit admin authorization on mutating coupon APIs:
+  - `POST /api/coupons`
+  - `PUT /api/coupons/{couponId}`
+  - `DELETE /api/coupons/{couponId}`
+- Added authenticated user/admin authorization on coupon apply:
+  - `POST /api/coupons/apply`
+- Added explicit admin authorization on mutating bus operator APIs:
+  - `POST /api/operators`
+  - `PUT /api/operators/{id}`
+  - `DELETE /api/operators/{id}/deactivate`
+- Updated `BookingController` cancellation email logic so it uses the dynamic cancellation policy refund amount instead of a hard-coded 50% calculation.
+
+### API Smoke Test
+
+The application was started on port `8081` because port `8080` was already in use. Login was tested with:
+
+```json
+{
+  "email": "amit@gmail.com",
+  "password": "password123"
+}
+```
+
+**Login result:** `200 OK`, user `Amit Birajadar`, role `USER`.
+
+The following endpoints were smoke-tested successfully:
+
+- `GET /api/trips`
+- `GET /api/routes`
+- `GET /api/buses`
+- `GET /api/coupons`
+- `GET /api/wallet`
+- `GET /api/wallet/transactions`
+- `GET /api/bookings/my`
+- `GET /api/users/1`
+- `GET /api/operators`
+- `GET /api/seat-preferences/1`
+- `GET /api/tokens/is-blacklisted`
+- `GET /api/trips/1`
+- `GET /api/trips/1/seats`
+- `GET /api/pricing/dynamic`
+- `GET /api/trips/search`
+- `GET /api/recommendations`
+- `GET /api/buses/1`
+- `GET /api/buses/1/seats`
+- `GET /api/routes/1`
+- `GET /api/bookings/1`
+- `GET /api/payments/1`
+- `GET /api/tickets/booking/1`
+- `GET /api/invoices/1`
+- `GET /api/qr-codes/1`
+
+Also verified that a normal `USER` receives `403 Forbidden` for admin-only bus creation:
+
+- `POST /api/buses`

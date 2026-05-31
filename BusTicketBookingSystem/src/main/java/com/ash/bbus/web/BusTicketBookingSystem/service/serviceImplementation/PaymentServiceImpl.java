@@ -8,6 +8,7 @@ import com.ash.bbus.web.BusTicketBookingSystem.entity.enums.PaymentStatus;
 import com.ash.bbus.web.BusTicketBookingSystem.exception.ResourceNotFoundException;
 import com.ash.bbus.web.BusTicketBookingSystem.repository.BookingRepository;
 import com.ash.bbus.web.BusTicketBookingSystem.repository.PaymentRepository;
+import com.ash.bbus.web.BusTicketBookingSystem.service.CancellationPolicyService;
 import com.ash.bbus.web.BusTicketBookingSystem.service.PaymentService;
 import com.ash.bbus.web.BusTicketBookingSystem.service.TicketService;
 
@@ -24,15 +25,18 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final TicketService ticketService;
+    private final CancellationPolicyService cancellationPolicyService;
 
     public PaymentServiceImpl(
             PaymentRepository paymentRepository,
             BookingRepository bookingRepository,
+            CancellationPolicyService cancellationPolicyService,
             // ✅ @Lazy prevents circular dependency
             // PaymentService → TicketService → BookingRepository
             @Lazy TicketService ticketService) {
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
+        this.cancellationPolicyService = cancellationPolicyService;
         this.ticketService = ticketService;
     }
 
@@ -96,9 +100,9 @@ public class PaymentServiceImpl implements PaymentService {
                 "Payment not found for booking: " + bookingId
             ));
 
-        // ✅ 50% refund calculation
-        BigDecimal refundAmount = payment.getAmount()
-            .divide(new BigDecimal("2"));
+        // ✅ Policy-based refund calculation
+        BigDecimal refundAmount = cancellationPolicyService
+            .calculateRefundAmount(bookingId);
 
         payment.setRefundAmount(refundAmount);
         payment.setStatus(PaymentStatus.REFUNDED);

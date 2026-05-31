@@ -2,6 +2,7 @@ package com.ash.bbus.web.BusTicketBookingSystem.controller;
 
 import com.ash.bbus.web.BusTicketBookingSystem.dto.ApiResponse;
 import com.ash.bbus.web.BusTicketBookingSystem.dto.BusDTO;
+import com.ash.bbus.web.BusTicketBookingSystem.dto.SeatDTO;
 import com.ash.bbus.web.BusTicketBookingSystem.service.BusService;
 
 import jakarta.validation.Valid;
@@ -55,6 +56,28 @@ public class BusController {
     }
 
     // ✅ PUT /api/buses/{id} — ADMIN only
+    @PostMapping("/{id}/seats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> addSeatsToBus(
+            @PathVariable Long id,
+            @Valid @RequestBody List<SeatDTO> seats) {
+
+        busService.addSeatsToBus(id, seats);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(ApiResponse.success("Seats added"));
+    }
+
+    @GetMapping("/{id}/seats")
+    public ResponseEntity<ApiResponse<List<SeatDTO>>> getSeatsByBus(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+            ApiResponse.success("Seats fetched",
+                busService.getSeatsByBus(id))
+        );
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<BusDTO>> updateBus(

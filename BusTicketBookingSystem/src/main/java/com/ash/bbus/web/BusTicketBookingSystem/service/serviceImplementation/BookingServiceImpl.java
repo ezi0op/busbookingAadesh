@@ -240,7 +240,7 @@ public class BookingServiceImpl implements BookingService {
         walletService.creditWallet(
             userId,
             cancellation.getRefundAmount(),
-            "50% Refund for Booking #" + bookingId,
+            "Refund for Booking #" + bookingId,
             bookingId
         );
 
